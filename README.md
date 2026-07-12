@@ -26,7 +26,7 @@ Three swappable seams (details in `backend/app/`):
 ## Status
 
 - [x] M1 — Ingestion, local embeddings, vector store, CLI query
-- [ ] M2 — Generation with verifiable citations
+- [x] M2 — Generation with verifiable citations
 - [ ] M3 — Evaluation harness (recall@k, MRR, Ragas)
 - [ ] M4 — Hybrid retrieval + reranking, measured improvement
 - [ ] M5 — FastAPI + Next.js frontend, Docker, CI, deploy
@@ -45,5 +45,11 @@ cp .env.example .env   # fill in your LLM API key (needed from M2 on)
 
 ```bash
 python cli.py ingest path/to/document.pdf
-python cli.py query "What does the document say about X?"
+python cli.py query "What does the document say about X?"   # raw retrieval
+python cli.py ask "What does the document say about X?"     # cited answer (M2)
 ```
+
+`ask` prints the answer followed by resolved citations — each `[n]` marker
+maps to the source file, page number, and the exact passage that grounded it.
+Questions the documents can't answer get an explicit "not found" response
+instead of a guess.

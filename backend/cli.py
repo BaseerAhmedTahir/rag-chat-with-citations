@@ -1,8 +1,9 @@
-"""Terminal interface: ingest documents and query the vector store.
+"""Terminal interface: ingest documents, query the store, ask with citations.
 
 Usage:
     python cli.py ingest <path>          # a .pdf/.docx file or a directory
-    python cli.py query "<question>" [--k 5]
+    python cli.py query "<question>" [--k 5]    # raw retrieval, no LLM
+    python cli.py ask "<question>" [--k 5]      # answer + resolved citations
 """
 
 from __future__ import annotations
@@ -77,6 +78,25 @@ def cmd_query(question: str, k: int) -> None:
         print(text)
 
 
+def cmd_ask(question: str, k: int) -> None:
+    from app.generation.providers import get_provider
+    from app.generation.rag import answer_question
+
+    provider = get_provider()
+    retriever = _build_retriever()
+    result = answer_question(question, retriever, provider, k=k)
+
+    print(f"\n{result.answer}\n")
+    if result.citations:
+        print("Citations")
+        print("=" * 72)
+        for c in result.citations:
+            print(f"[{c.marker}] {c.source_file} — page {c.page_number}")
+            print(f"    {c.snippet}")
+    elif result.found:
+        print("(The model returned an answer without citation markers.)")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="RAG document chat CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -88,11 +108,17 @@ def main() -> None:
     p_query.add_argument("question")
     p_query.add_argument("--k", type=int, default=settings.top_k)
 
+    p_ask = sub.add_parser("ask", help="Answer a question with cited sources")
+    p_ask.add_argument("question")
+    p_ask.add_argument("--k", type=int, default=settings.top_k)
+
     args = parser.parse_args()
     if args.command == "ingest":
         cmd_ingest(args.path)
     elif args.command == "query":
         cmd_query(args.question, args.k)
+    elif args.command == "ask":
+        cmd_ask(args.question, args.k)
 
 
 if __name__ == "__main__":
