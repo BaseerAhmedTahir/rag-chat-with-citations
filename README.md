@@ -25,7 +25,7 @@ Three swappable seams (details in `backend/app/`):
 
 ## Status
 
-- [ ] M1 — Ingestion, local embeddings, vector store, CLI query
+- [x] M1 — Ingestion, local embeddings, vector store, CLI query
 - [ ] M2 — Generation with verifiable citations
 - [ ] M3 — Evaluation harness (recall@k, MRR, Ragas)
 - [ ] M4 — Hybrid retrieval + reranking, measured improvement
