@@ -1,0 +1,9 @@
+# Resolved at install time on 2026-07-12 (Python 3.12, CPU-only).
+sentence-transformers==5.6.0
+chromadb==1.5.9
+pymupdf==1.28.0
+python-docx==1.2.0
+
+# Dev / test
+pytest==9.1.1
+ruff==0.15.21
