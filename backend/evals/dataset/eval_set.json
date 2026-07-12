@@ -1,0 +1,135 @@
+{
+  "description": "Hand-authored eval examples over the generated document set. relevant_source labels the file and page that grounds the answer.",
+  "examples": [
+    {
+      "question": "When and where was Northwind Robotics founded?",
+      "ground_truth_answer": "Northwind Robotics was founded in 2017 in Tallinn, Estonia.",
+      "relevant_source": {"file": "northwind_handbook.pdf", "page": 1}
+    },
+    {
+      "question": "How many paid vacation days do full-time employees receive per year?",
+      "ground_truth_answer": "Full-time employees receive 27 days of paid vacation per year, in addition to public holidays.",
+      "relevant_source": {"file": "northwind_handbook.pdf", "page": 2}
+    },
+    {
+      "question": "How many unused vacation days can be carried over to the next year?",
+      "ground_truth_answer": "Up to 5 unused vacation days can be carried over into the first quarter of the following year.",
+      "relevant_source": {"file": "northwind_handbook.pdf", "page": 2}
+    },
+    {
+      "question": "What authentication is required to access production systems?",
+      "ground_truth_answer": "All employees must use hardware security keys; passwords alone are never sufficient.",
+      "relevant_source": {"file": "northwind_handbook.pdf", "page": 3}
+    },
+    {
+      "question": "What is the home office stipend for remote employees and how often does it renew?",
+      "ground_truth_answer": "Remote employees receive a one-time home office stipend of $1,200, which renews every three years.",
+      "relevant_source": {"file": "northwind_handbook.pdf", "page": 4}
+    },
+    {
+      "question": "What bonus do engineers receive for being on call?",
+      "ground_truth_answer": "The on-call rotation includes a compensation bonus of 8% of weekly salary.",
+      "relevant_source": {"file": "northwind_handbook.pdf", "page": 5}
+    },
+    {
+      "question": "What is the maximum payload of the Atlas P-100?",
+      "ground_truth_answer": "The Atlas P-100 carries payloads of up to 15 kg.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 1}
+    },
+    {
+      "question": "What is the top speed of the Atlas P-100 robot?",
+      "ground_truth_answer": "The Atlas P-100 travels at a top speed of 2.5 m/s.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 1}
+    },
+    {
+      "question": "How long does the P-100 battery last and how fast does it charge?",
+      "ground_truth_answer": "The battery is rated for 8 hours of continuous operation, and the fast-charge dock restores 80% capacity in 45 minutes.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 2}
+    },
+    {
+      "question": "What type of battery does the Atlas P-100 use?",
+      "ground_truth_answer": "It uses a lithium iron phosphate (LiFePO4) battery pack.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 2}
+    },
+    {
+      "question": "What sensors does the P-100 use for navigation?",
+      "ground_truth_answer": "Navigation combines six stereo camera pairs with two solid-state lidar units with a range of 100 meters.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 3}
+    },
+    {
+      "question": "How many robots can the Hive fleet manager support per site?",
+      "ground_truth_answer": "The Hive fleet manager supports up to 500 robots per site.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 4}
+    },
+    {
+      "question": "How quickly does the P-100 emergency stop system halt the robot?",
+      "ground_truth_answer": "The emergency stop system halts the robot within 250 milliseconds.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 5}
+    },
+    {
+      "question": "What safety standard does the Atlas P-100 comply with?",
+      "ground_truth_answer": "The P-100 complies with the ISO 3691-4 standard for driverless industrial trucks.",
+      "relevant_source": {"file": "atlas_spec.pdf", "page": 5}
+    },
+    {
+      "question": "What was Northwind's revenue in Q3 2025 and how much did it grow?",
+      "ground_truth_answer": "Q3 2025 revenue was EUR 18.4 million, an increase of 22% year over year.",
+      "relevant_source": {"file": "q3_financial_report.pdf", "page": 1}
+    },
+    {
+      "question": "What was the company's cash position at the end of Q3 2025?",
+      "ground_truth_answer": "The quarter closed with a cash position of EUR 31 million and no outstanding debt.",
+      "relevant_source": {"file": "q3_financial_report.pdf", "page": 1}
+    },
+    {
+      "question": "How much revenue did software subscriptions contribute in Q3 2025?",
+      "ground_truth_answer": "Software subscriptions contributed EUR 4.2 million, growing 38% year over year.",
+      "relevant_source": {"file": "q3_financial_report.pdf", "page": 2}
+    },
+    {
+      "question": "How much did Northwind spend on research and development in Q3 2025?",
+      "ground_truth_answer": "R&D spending reached EUR 3.8 million, representing 21% of quarterly revenue.",
+      "relevant_source": {"file": "q3_financial_report.pdf", "page": 3}
+    },
+    {
+      "question": "What is the revenue guidance for Q4 2025?",
+      "ground_truth_answer": "Management guides fourth-quarter revenue of EUR 20 to 21 million.",
+      "relevant_source": {"file": "q3_financial_report.pdf", "page": 4}
+    },
+    {
+      "question": "What are the current lead times for solid-state lidar units?",
+      "ground_truth_answer": "Lead times for solid-state lidar units remain elevated at 26 weeks.",
+      "relevant_source": {"file": "q3_financial_report.pdf", "page": 5}
+    },
+    {
+      "question": "How many robots were deployed in the Rotterdam pilot and for how long did it run?",
+      "ground_truth_answer": "The 12-week pilot deployed 40 Atlas P-100 robots at the Rotterdam distribution center, running from March through May 2025.",
+      "relevant_source": {"file": "rotterdam_pilot_study.pdf", "page": 1}
+    },
+    {
+      "question": "What was the primary metric used in the Rotterdam pilot study?",
+      "ground_truth_answer": "The primary metric was picks per hour per worker.",
+      "relevant_source": {"file": "rotterdam_pilot_study.pdf", "page": 2}
+    },
+    {
+      "question": "By how much did throughput increase in the robot-assisted zone during the pilot?",
+      "ground_truth_answer": "Zone A throughput increased by 34% compared to the control zone.",
+      "relevant_source": {"file": "rotterdam_pilot_study.pdf", "page": 3}
+    },
+    {
+      "question": "What happened to the mis-pick error rate during the Rotterdam pilot?",
+      "ground_truth_answer": "The mis-pick error rate fell from 1.8% to 0.4% over the pilot period.",
+      "relevant_source": {"file": "rotterdam_pilot_study.pdf", "page": 3}
+    },
+    {
+      "question": "What was the mean time between failures across the robot fleet in the pilot?",
+      "ground_truth_answer": "Mean time between failures (MTBF) across the fleet was 410 hours.",
+      "relevant_source": {"file": "rotterdam_pilot_study.pdf", "page": 4}
+    },
+    {
+      "question": "What is the projected return on investment period from the pilot study?",
+      "ground_truth_answer": "The projected return on investment period is 14 months.",
+      "relevant_source": {"file": "rotterdam_pilot_study.pdf", "page": 5}
+    }
+  ]
+}
