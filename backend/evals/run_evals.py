@@ -109,22 +109,44 @@ def eval_retrieval(
 
 
 def generate_answers(
-    retriever: Retriever, examples: list[Example], k: int, sleep_s: float
+    retriever: Retriever,
+    examples: list[Example],
+    k: int,
+    sleep_s: float,
+    cache_path: Path,
 ) -> list[dict]:
+    """Generate answers, caching each one so an interrupted run (rate
+    limits, daily quota) resumes without re-spending API quota."""
     provider = get_provider()
+    cache: dict[str, dict] = {}
+    if cache_path.exists():
+        cache = {
+            row["question"]: row
+            for row in json.loads(cache_path.read_text(encoding="utf-8"))
+        }
+        print(f"  resuming: {len(cache)} answers already cached")
+
     rows: list[dict] = []
     for i, ex in enumerate(examples, start=1):
+        if ex.question in cache:
+            rows.append(cache[ex.question])
+            continue
         result = answer_question(ex.question, retriever, provider, k=k)
-        rows.append(
-            {
-                "question": ex.question,
-                "answer": result.answer,
-                "reference": ex.ground_truth_answer,
-                "contexts": [c.text for c in result.retrieved],
-                "cited_pages": [
-                    f"{c.source_file}:{c.page_number}" for c in result.citations
-                ],
-            }
+        row = {
+            "question": ex.question,
+            "answer": result.answer,
+            "reference": ex.ground_truth_answer,
+            "contexts": [c.text for c in result.retrieved],
+            "cited_pages": [
+                f"{c.source_file}:{c.page_number}" for c in result.citations
+            ],
+        }
+        rows.append(row)
+        cache[ex.question] = row
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(
+            json.dumps(list(cache.values()), ensure_ascii=False, indent=1),
+            encoding="utf-8",
         )
         print(f"  [{i}/{len(examples)}] generated ({len(result.citations)} citations)")
         if i < len(examples):
@@ -242,8 +264,16 @@ def main() -> None:
     summary, per_question = eval_retrieval(retriever, examples)
 
     if not args.skip_ragas:
-        print(f"Generating answers (k={args.k}, sleep={args.sleep}s)…")
-        generation_rows = generate_answers(retriever, examples, args.k, args.sleep)
+        import os
+
+        gen_model = os.getenv("GEMINI_MODEL", "default")
+        cache_path = EVALS_DIR / ".cache" / f"gen_{args.label}_{gen_model}.json"
+        print(
+            f"Generating answers (k={args.k}, sleep={args.sleep}s, model={gen_model})…"
+        )
+        generation_rows = generate_answers(
+            retriever, examples, args.k, args.sleep, cache_path
+        )
         print("Running Ragas judge metrics…")
         ragas_summary = eval_ragas(generation_rows)
         summary.update(ragas_summary)

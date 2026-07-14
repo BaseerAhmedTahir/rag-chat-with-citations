@@ -18,6 +18,7 @@ build/
 # Vector store / data artifacts
 backend/data/
 backend/evals/.index/
+backend/evals/.cache/
 chroma_db/
 *.chroma
 
