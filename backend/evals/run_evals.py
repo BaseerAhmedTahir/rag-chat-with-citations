@@ -197,7 +197,14 @@ def eval_ragas(
         "context_precision": LLMContextPrecisionWithReference,
         "context_recall": LLMContextRecall,
     }
-    metrics = [metric_registry[name]() for name in metric_names]
+    metrics = []
+    for name in metric_names:
+        metric = metric_registry[name]()
+        if name == "answer_relevancy":
+            # default strictness=3 asks for n=3 completions per call,
+            # which Groq's API rejects ("'n' must be at most 1")
+            metric.strictness = 1
+        metrics.append(metric)
 
     judge_provider = os.getenv(
         "RAGAS_JUDGE_PROVIDER", os.getenv("LLM_PROVIDER", "gemini")
