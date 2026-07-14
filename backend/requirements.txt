@@ -13,6 +13,7 @@ ragas==0.3.9
 langchain-google-genai==2.1.12
 langchain-huggingface==0.3.1
 langchain-community==0.3.31
+langchain-groq==0.3.8
 pandas==3.0.3
 tabulate==0.10.0
 

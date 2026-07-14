@@ -70,12 +70,30 @@ def load_eval_set() -> list[Example]:
     return examples
 
 
-def build_index(chunk_size: int, overlap: int, collection: str) -> Retriever:
+def build_index(
+    chunk_size: int, overlap: int, collection: str, retriever_kind: str
+) -> Retriever:
     codec = HFTokenCodec()
     embedder = SentenceTransformerEmbedder()
-    retriever = VectorRetriever(
+    vector = VectorRetriever(
         embedder, persist_dir=INDEX_DIR, collection_name=collection
     )
+
+    retriever: Retriever
+    if retriever_kind == "vector":
+        retriever = vector
+    elif retriever_kind == "hybrid":
+        from app.retrieval.hybrid import HybridRetriever
+
+        retriever = HybridRetriever(vector)
+    elif retriever_kind == "hybrid_rerank":
+        from app.retrieval.hybrid import HybridRetriever
+        from app.retrieval.rerank import RerankingRetriever
+
+        retriever = RerankingRetriever(HybridRetriever(vector))
+    else:
+        raise ValueError(f"Unknown retriever kind: {retriever_kind!r}")
+
     for pdf in sorted(DOCS_DIR.glob("*.pdf")):
         doc = parse_document(pdf)
         chunks = chunk_document(
@@ -154,7 +172,11 @@ def generate_answers(
     return rows
 
 
-def eval_ragas(generation_rows: list[dict]) -> dict[str, float]:
+def eval_ragas(
+    generation_rows: list[dict],
+    metric_names: list[str],
+    timeout: int,
+) -> dict[str, float]:
     import os
 
     from langchain_huggingface import HuggingFaceEmbeddings
@@ -168,6 +190,14 @@ def eval_ragas(generation_rows: list[dict]) -> dict[str, float]:
         ResponseRelevancy,
     )
     from ragas.run_config import RunConfig
+
+    metric_registry = {
+        "faithfulness": Faithfulness,
+        "answer_relevancy": ResponseRelevancy,
+        "context_precision": LLMContextPrecisionWithReference,
+        "context_recall": LLMContextRecall,
+    }
+    metrics = [metric_registry[name]() for name in metric_names]
 
     judge_provider = os.getenv(
         "RAGAS_JUDGE_PROVIDER", os.getenv("LLM_PROVIDER", "gemini")
@@ -211,15 +241,10 @@ def eval_ragas(generation_rows: list[dict]) -> dict[str, float]:
     )
     result = evaluate(
         dataset=dataset,
-        metrics=[
-            Faithfulness(),
-            ResponseRelevancy(),
-            LLMContextPrecisionWithReference(),
-            LLMContextRecall(),
-        ],
+        metrics=metrics,
         llm=judge,
         embeddings=embeddings,
-        run_config=RunConfig(max_workers=1, timeout=120),
+        run_config=RunConfig(max_workers=1, timeout=timeout),
     )
     df = result.to_pandas()
     metric_cols = [
@@ -227,7 +252,12 @@ def eval_ragas(generation_rows: list[dict]) -> dict[str, float]:
         for c in df.columns
         if c not in ("user_input", "response", "retrieved_contexts", "reference")
     ]
-    return {col: float(df[col].mean()) for col in metric_cols}
+    summary: dict[str, float] = {}
+    for col in metric_cols:
+        scored = int(df[col].notna().sum())
+        summary[col] = float(df[col].mean())
+        print(f"  {col}: {summary[col]:.4f} ({scored}/{len(df)} samples scored)")
+    return summary
 
 
 def write_tables(
@@ -237,10 +267,19 @@ def write_tables(
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    summary_df = pd.DataFrame([summary])
-    summary_df.insert(0, "config", label)
     csv_path = RESULTS_DIR / f"{label}_summary.csv"
     md_path = RESULTS_DIR / f"{label}_summary.md"
+
+    # merge with an existing summary so targeted metric reruns update
+    # columns instead of discarding previous results
+    if csv_path.exists():
+        merged = pd.read_csv(csv_path).iloc[0].to_dict()
+        merged.pop("config", None)
+        merged.update({k: v for k, v in summary.items() if pd.notna(v)})
+        summary = merged
+
+    summary_df = pd.DataFrame([summary])
+    summary_df.insert(0, "config", label)
     summary_df.to_csv(csv_path, index=False)
     md_path.write_text(
         f"# Eval results — {label}\n\n{summary_df.to_markdown(index=False)}\n",
@@ -256,6 +295,11 @@ def write_tables(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the RAG evaluation harness")
     parser.add_argument("--label", default="baseline")
+    parser.add_argument(
+        "--retriever",
+        choices=["vector", "hybrid", "hybrid_rerank"],
+        default="vector",
+    )
     parser.add_argument("--chunk-size", type=int, default=settings.chunk_size_tokens)
     parser.add_argument("--overlap", type=int, default=settings.chunk_overlap_tokens)
     parser.add_argument("--k", type=int, default=settings.top_k)
@@ -266,14 +310,23 @@ def main() -> None:
         help="seconds between generation calls (free-tier RPM)",
     )
     parser.add_argument("--skip-ragas", action="store_true")
+    parser.add_argument(
+        "--ragas-metrics",
+        default="faithfulness,answer_relevancy,context_precision,context_recall",
+        help="comma-separated subset, for targeted reruns",
+    )
+    parser.add_argument("--ragas-timeout", type=int, default=300)
     args = parser.parse_args()
 
     examples = load_eval_set()
     print(f"Loaded {len(examples)} eval examples")
 
-    collection = f"eval_{args.label}_cs{args.chunk_size}"
-    print(f"Building index (chunk_size={args.chunk_size}, overlap={args.overlap})…")
-    retriever = build_index(args.chunk_size, args.overlap, collection)
+    collection = f"eval_cs{args.chunk_size}_ov{args.overlap}"
+    print(
+        f"Building index (chunk_size={args.chunk_size}, overlap={args.overlap}, "
+        f"retriever={args.retriever})…"
+    )
+    retriever = build_index(args.chunk_size, args.overlap, collection, args.retriever)
 
     print("Running retrieval metrics…")
     summary, per_question = eval_retrieval(retriever, examples)
@@ -287,7 +340,11 @@ def main() -> None:
             retriever, examples, args.k, args.sleep, cache_path
         )
         print("Running Ragas judge metrics…")
-        ragas_summary = eval_ragas(generation_rows)
+        ragas_summary = eval_ragas(
+            generation_rows,
+            metric_names=[m.strip() for m in args.ragas_metrics.split(",")],
+            timeout=args.ragas_timeout,
+        )
         summary.update(ragas_summary)
         for row, gen in zip(per_question, generation_rows):
             row["answer"] = gen["answer"]
