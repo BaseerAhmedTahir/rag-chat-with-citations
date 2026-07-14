@@ -76,3 +76,19 @@ class VectorRetriever:
 
     def count(self) -> int:
         return self._collection.count()
+
+    def all_chunks(self) -> list[Chunk]:
+        """Full corpus dump, used by keyword indexes built on top."""
+        result = self._collection.get(include=["documents", "metadatas"])
+        return [
+            Chunk(
+                id=chunk_id,
+                text=text,
+                source_file=str(meta["source_file"]),
+                page_number=int(meta["page_number"]),
+                chunk_index=int(meta["chunk_index"]),
+            )
+            for chunk_id, text, meta in zip(
+                result["ids"], result["documents"], result["metadatas"]
+            )
+        ]
