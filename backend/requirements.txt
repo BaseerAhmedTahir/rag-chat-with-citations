@@ -6,6 +6,16 @@ python-docx==1.2.0
 python-dotenv==1.2.2
 httpx==0.28.1
 
+# Evals (M3)
+# ragas 0.4.x is incompatible with langchain-community 0.4.x (imports the
+# removed vertexai chat model), so the whole langchain stack is pinned to 0.3.x.
+ragas==0.3.9
+langchain-google-genai==2.1.12
+langchain-huggingface==0.3.1
+langchain-community==0.3.31
+pandas==3.0.3
+tabulate==0.10.0
+
 # Dev / test
 pytest==9.1.1
 ruff==0.15.21
