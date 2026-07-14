@@ -8,11 +8,29 @@ one registry entry; nothing downstream changes.
 from __future__ import annotations
 
 import os
+import time
 from typing import Protocol
 
 import httpx
 
 _TIMEOUT_SECONDS = 60.0
+_MAX_ATTEMPTS = 5
+_RETRY_STATUS = (429, 503)
+
+
+def _post_with_retry(url: str, json: dict, headers: dict) -> httpx.Response:
+    """POST with exponential backoff on rate-limit/overload responses."""
+    response: httpx.Response | None = None
+    for attempt in range(_MAX_ATTEMPTS):
+        response = httpx.post(
+            url, json=json, headers=headers, timeout=_TIMEOUT_SECONDS
+        )
+        if response.status_code not in _RETRY_STATUS:
+            return response
+        if attempt < _MAX_ATTEMPTS - 1:
+            time.sleep(15 * (attempt + 1))
+    assert response is not None
+    return response
 
 
 class ChatProvider(Protocol):
@@ -47,11 +65,8 @@ class GeminiProvider:
             "contents": [{"role": "user", "parts": [{"text": user}]}],
             "generationConfig": {"temperature": 0.1},
         }
-        response = httpx.post(
-            url,
-            json=body,
-            headers={"x-goog-api-key": self._api_key},
-            timeout=_TIMEOUT_SECONDS,
+        response = _post_with_retry(
+            url, json=body, headers={"x-goog-api-key": self._api_key}
         )
         if response.status_code != 200:
             raise ProviderError(
@@ -78,7 +93,7 @@ class _OpenAICompatibleProvider:
         self._model = model or os.getenv(self.model_env, self.default_model)
 
     def complete(self, system: str, user: str) -> str:
-        response = httpx.post(
+        response = _post_with_retry(
             f"{self.base_url}/chat/completions",
             json={
                 "model": self._model,
@@ -89,7 +104,6 @@ class _OpenAICompatibleProvider:
                 "temperature": 0.1,
             },
             headers={"Authorization": f"Bearer {self._api_key}"},
-            timeout=_TIMEOUT_SECONDS,
         )
         if response.status_code != 200:
             raise ProviderError(

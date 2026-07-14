@@ -154,6 +154,7 @@ def eval_ragas(generation_rows: list[dict]) -> dict[str, float]:
             model=judge_model,
             temperature=0.0,
             google_api_key=os.environ["GEMINI_API_KEY"],
+            max_retries=6,
         )
     )
     embeddings = LangchainEmbeddingsWrapper(
@@ -224,7 +225,7 @@ def main() -> None:
     parser.add_argument(
         "--sleep",
         type=float,
-        default=6.0,
+        default=13.0,
         help="seconds between generation calls (free-tier RPM)",
     )
     parser.add_argument("--skip-ragas", action="store_true")
