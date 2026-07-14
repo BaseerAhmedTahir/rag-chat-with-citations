@@ -157,7 +157,6 @@ def generate_answers(
 def eval_ragas(generation_rows: list[dict]) -> dict[str, float]:
     import os
 
-    from langchain_google_genai import ChatGoogleGenerativeAI
     from langchain_huggingface import HuggingFaceEmbeddings
     from ragas import EvaluationDataset, evaluate
     from ragas.embeddings import LangchainEmbeddingsWrapper
@@ -170,15 +169,31 @@ def eval_ragas(generation_rows: list[dict]) -> dict[str, float]:
     )
     from ragas.run_config import RunConfig
 
-    judge_model = os.getenv("RAGAS_JUDGE_MODEL", "gemini-2.5-flash-lite")
-    judge = LangchainLLMWrapper(
-        ChatGoogleGenerativeAI(
+    judge_provider = os.getenv(
+        "RAGAS_JUDGE_PROVIDER", os.getenv("LLM_PROVIDER", "gemini")
+    ).lower()
+    if judge_provider == "groq":
+        from langchain_groq import ChatGroq
+
+        judge_model = os.getenv("RAGAS_JUDGE_MODEL", "llama-3.3-70b-versatile")
+        judge_llm = ChatGroq(
+            model=judge_model,
+            temperature=0.0,
+            api_key=os.environ["GROQ_API_KEY"],
+            max_retries=6,
+        )
+    else:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+
+        judge_model = os.getenv("RAGAS_JUDGE_MODEL", "gemini-2.5-flash-lite")
+        judge_llm = ChatGoogleGenerativeAI(
             model=judge_model,
             temperature=0.0,
             google_api_key=os.environ["GEMINI_API_KEY"],
             max_retries=6,
         )
-    )
+    print(f"  judge: {judge_provider}/{judge_model}")
+    judge = LangchainLLMWrapper(judge_llm)
     embeddings = LangchainEmbeddingsWrapper(
         HuggingFaceEmbeddings(model_name=settings.embedding_model)
     )
@@ -264,13 +279,10 @@ def main() -> None:
     summary, per_question = eval_retrieval(retriever, examples)
 
     if not args.skip_ragas:
-        import os
-
-        gen_model = os.getenv("GEMINI_MODEL", "default")
-        cache_path = EVALS_DIR / ".cache" / f"gen_{args.label}_{gen_model}.json"
-        print(
-            f"Generating answers (k={args.k}, sleep={args.sleep}s, model={gen_model})…"
-        )
+        probe = get_provider()
+        gen_id = f"{type(probe).__name__}_{probe.model}".replace("/", "-")
+        cache_path = EVALS_DIR / ".cache" / f"gen_{args.label}_{gen_id}.json"
+        print(f"Generating answers (k={args.k}, sleep={args.sleep}s, gen={gen_id})…")
         generation_rows = generate_answers(
             retriever, examples, args.k, args.sleep, cache_path
         )

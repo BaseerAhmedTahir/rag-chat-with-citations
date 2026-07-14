@@ -1,4 +1,4 @@
-"""The ChatProvider interface — swappable seam #2.
+﻿"""The ChatProvider interface — swappable seam #2.
 
 Providers are thin REST wrappers (no vendor SDKs) selected by the
 ``LLM_PROVIDER`` env var. Adding a provider means adding one class and
@@ -53,12 +53,12 @@ def _require_env(name: str) -> str:
 class GeminiProvider:
     def __init__(self, model: str | None = None) -> None:
         self._api_key = _require_env("GEMINI_API_KEY")
-        self._model = model or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        self.model = model or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
     def complete(self, system: str, user: str) -> str:
         url = (
             "https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{self._model}:generateContent"
+            f"{self.model}:generateContent"
         )
         body = {
             "system_instruction": {"parts": [{"text": system}]},
@@ -90,13 +90,13 @@ class _OpenAICompatibleProvider:
 
     def __init__(self, model: str | None = None) -> None:
         self._api_key = _require_env(self.key_env)
-        self._model = model or os.getenv(self.model_env, self.default_model)
+        self.model = model or os.getenv(self.model_env, self.default_model)
 
     def complete(self, system: str, user: str) -> str:
         response = _post_with_retry(
             f"{self.base_url}/chat/completions",
             json={
-                "model": self._model,
+                "model": self.model,
                 "messages": [
                     {"role": "system", "content": system},
                     {"role": "user", "content": user},
