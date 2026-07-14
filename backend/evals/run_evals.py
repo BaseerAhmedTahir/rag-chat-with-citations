@@ -346,13 +346,19 @@ def main() -> None:
         generation_rows = generate_answers(
             retriever, examples, args.k, args.sleep, cache_path
         )
-        print("Running Ragas judge metrics…")
-        ragas_summary = eval_ragas(
-            generation_rows,
-            metric_names=[m.strip() for m in args.ragas_metrics.split(",")],
-            timeout=args.ragas_timeout,
-        )
-        summary.update(ragas_summary)
+        metric_names = [
+            m.strip()
+            for m in args.ragas_metrics.split(",")
+            if m.strip() and m.strip() != "none"
+        ]
+        if metric_names:
+            print("Running Ragas judge metrics…")
+            ragas_summary = eval_ragas(
+                generation_rows,
+                metric_names=metric_names,
+                timeout=args.ragas_timeout,
+            )
+            summary.update(ragas_summary)
         for row, gen in zip(per_question, generation_rows):
             row["answer"] = gen["answer"]
             row["cited_pages"] = "; ".join(gen["cited_pages"])
