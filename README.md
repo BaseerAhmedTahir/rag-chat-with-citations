@@ -21,13 +21,27 @@ Three swappable seams (details in `backend/app/`):
 - `ChatProvider` — hosted LLM APIs, selected via `LLM_PROVIDER` env var
 - `Embedder` — local CPU sentence-transformers (`BAAI/bge-small-en-v1.5`)
 
-<!-- Architecture diagram, screenshot, eval results table, and live link added as milestones complete. -->
+<!-- Architecture diagram, screenshot, and live link added as milestones complete. -->
+
+## Evaluation (M3 baseline)
+
+Measured on 26 hand-labeled examples over 4 documents — see
+[backend/evals/results](backend/evals/results/README.md) for full tables,
+judge models, and interpretation:
+
+| recall@1 | recall@3 | mrr@10 | faithfulness | answer relevancy | context precision | context recall |
+|---------:|---------:|-------:|-------------:|-----------------:|------------------:|---------------:|
+|    0.808 |    0.962 |  0.884 |    **1.000** |            0.881 |             0.872 |          0.724 |
+
+Retrieval metrics (recall@k, MRR) are implemented from scratch and unit-tested;
+answer metrics are Ragas (LLM-as-judge). Faithfulness 1.00 means every
+statement in every answer was entailed by the retrieved passages.
 
 ## Status
 
 - [x] M1 — Ingestion, local embeddings, vector store, CLI query
 - [x] M2 — Generation with verifiable citations
-- [ ] M3 — Evaluation harness (recall@k, MRR, Ragas)
+- [x] M3 — Evaluation harness (recall@k, MRR, Ragas)
 - [ ] M4 — Hybrid retrieval + reranking, measured improvement
 - [ ] M5 — FastAPI + Next.js frontend, Docker, CI, deploy
 
