@@ -176,6 +176,7 @@ def eval_ragas(
     generation_rows: list[dict],
     metric_names: list[str],
     timeout: int,
+    label: str,
 ) -> dict[str, float]:
     import os
 
@@ -264,6 +265,19 @@ def eval_ragas(
         scored = int(df[col].notna().sum())
         summary[col] = float(df[col].mean())
         print(f"  {col}: {summary[col]:.4f} ({scored}/{len(df)} samples scored)")
+
+    # persist per-sample scores so coverage is auditable after the fact
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    detail_path = RESULTS_DIR / f"{label}_ragas_detail.csv"
+    detail = df.drop(columns=["retrieved_contexts"], errors="ignore")
+    if detail_path.exists():
+        import pandas as pd
+
+        existing = pd.read_csv(detail_path)
+        for col in metric_cols:
+            existing[col] = detail[col].values
+        detail = existing
+    detail.to_csv(detail_path, index=False)
     return summary
 
 
@@ -357,6 +371,7 @@ def main() -> None:
                 generation_rows,
                 metric_names=metric_names,
                 timeout=args.ragas_timeout,
+                label=args.label,
             )
             summary.update(ragas_summary)
         for row, gen in zip(per_question, generation_rows):

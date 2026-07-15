@@ -12,9 +12,7 @@ from collections.abc import Sequence
 SourcePage = tuple[str, int]  # (source_file, page_number)
 
 
-def hit_at_k(
-    ranked: Sequence[SourcePage], relevant: set[SourcePage], k: int
-) -> float:
+def hit_at_k(ranked: Sequence[SourcePage], relevant: set[SourcePage], k: int) -> float:
     """1.0 if any of the top-k results is relevant, else 0.0."""
     if k <= 0:
         raise ValueError("k must be positive")
