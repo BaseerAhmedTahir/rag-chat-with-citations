@@ -1,0 +1,27 @@
+question,hit@1,hit@3,hit@5,reciprocal_rank,answer,cited_pages
+When and where was Northwind Robotics founded?,1.0,1.0,1.0,1.0,"Northwind Robotics was founded in 2017 in Tallinn, Estonia [1].",northwind_handbook.pdf:1
+How many paid vacation days do full-time employees receive per year?,1.0,1.0,1.0,1.0,Full-time employees receive 27 days of paid vacation per year [1].,northwind_handbook.pdf:2
+How many unused vacation days can be carried over to the next year?,1.0,1.0,1.0,1.0,"According to the vacation policy, unused vacation days can be carried over into the first quarter of the following year, up to a maximum of 5 days [1].",northwind_handbook.pdf:2
+What authentication is required to access production systems?,1.0,1.0,1.0,1.0,All employees must use hardware security keys for authentication to production systems [1]. Passwords alone are never sufficient for access to customer data [1].,northwind_handbook.pdf:3
+What is the home office stipend for remote employees and how often does it renew?,1.0,1.0,1.0,1.0,"The home office stipend for remote employees is $1,200, and it renews every three years [1].",northwind_handbook.pdf:4
+What bonus do engineers receive for being on call?,1.0,1.0,1.0,1.0,Engineers receive a compensation bonus of 8% of weekly salary for being on call [1].,northwind_handbook.pdf:5
+What is the maximum payload of the Atlas P-100?,1.0,1.0,1.0,1.0,The maximum payload of the Atlas P-100 is 15 kg [1].,atlas_spec.pdf:1
+What is the top speed of the Atlas P-100 robot?,1.0,1.0,1.0,1.0,The top speed of the Atlas P-100 robot is 2.5 m/s [1].,atlas_spec.pdf:1
+How long does the P-100 battery last and how fast does it charge?,1.0,1.0,1.0,1.0,The P-100 battery pack is rated for 8 hours of continuous operation [1]. The battery can be restored to 80% capacity in 45 minutes using a fast-charge dock [1].,atlas_spec.pdf:2
+What type of battery does the Atlas P-100 use?,1.0,1.0,1.0,1.0,The Atlas P-100 uses a lithium iron phosphate (LiFePO4) battery pack [1].,atlas_spec.pdf:2
+What sensors does the P-100 use for navigation?,0.0,0.0,0.0,0.16666666666666666,I could not find this in the provided documents.,
+How many robots can the Hive fleet manager support per site?,1.0,1.0,1.0,1.0,The Hive fleet manager supports up to 500 robots per site [1].,atlas_spec.pdf:4
+How quickly does the P-100 emergency stop system halt the robot?,1.0,1.0,1.0,1.0,The P-100 emergency stop system halts the robot within 250 milliseconds [1].,atlas_spec.pdf:5
+What safety standard does the Atlas P-100 comply with?,1.0,1.0,1.0,1.0,The Atlas P-100 complies with the ISO 3691-4 standard for driverless industrial trucks [1].,atlas_spec.pdf:5
+What was Northwind's revenue in Q3 2025 and how much did it grow?,1.0,1.0,1.0,1.0,"Northwind Robotics' revenue in Q3 2025 was EUR 18.4 million [1], which represents a 22% increase year over year [1].",q3_financial_report.pdf:1
+What was the company's cash position at the end of Q3 2025?,1.0,1.0,1.0,1.0,The company's cash position at the end of Q3 2025 was EUR 31 million [1].,q3_financial_report.pdf:1
+How much revenue did software subscriptions contribute in Q3 2025?,0.0,1.0,1.0,0.5,Software subscriptions contributed EUR 4.2 million in revenue in Q3 2025 [2].,q3_financial_report.pdf:2
+How much did Northwind spend on research and development in Q3 2025?,0.0,1.0,1.0,0.5,Northwind Robotics spent EUR 3.8 million on research and development in Q3 2025 [2].,q3_financial_report.pdf:3
+What is the revenue guidance for Q4 2025?,1.0,1.0,1.0,1.0,The revenue guidance for Q4 is EUR 20 to 21 million [1].,q3_financial_report.pdf:4
+What are the current lead times for solid-state lidar units?,1.0,1.0,1.0,1.0,The current lead times for solid-state lidar units remain elevated at 26 weeks [1].,q3_financial_report.pdf:5
+How many robots were deployed in the Rotterdam pilot and for how long did it run?,1.0,1.0,1.0,1.0,"40 Atlas P-100 robots were deployed [1] in the Rotterdam pilot, which ran for 12 weeks [1], from March through May 2025 [1].",rotterdam_pilot_study.pdf:1
+What was the primary metric used in the Rotterdam pilot study?,1.0,1.0,1.0,1.0,The primary metric used in the Rotterdam pilot study was picks per hour per worker [1].,rotterdam_pilot_study.pdf:2
+By how much did throughput increase in the robot-assisted zone during the pilot?,1.0,1.0,1.0,1.0,Throughput in Zone A increased by 34% compared to the control zone [1].,rotterdam_pilot_study.pdf:3
+What happened to the mis-pick error rate during the Rotterdam pilot?,1.0,1.0,1.0,1.0,The mis-pick error rate fell from 1.8% to 0.4% over the pilot period [1].,rotterdam_pilot_study.pdf:3
+What was the mean time between failures across the robot fleet in the pilot?,1.0,1.0,1.0,1.0,The mean time between failures (MTBF) across the fleet was 410 hours [1].,rotterdam_pilot_study.pdf:4
+What is the projected return on investment period from the pilot study?,1.0,1.0,1.0,1.0,The projected return on investment period is 14 months [1].,rotterdam_pilot_study.pdf:5
