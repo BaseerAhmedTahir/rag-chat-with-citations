@@ -23,26 +23,34 @@ Three swappable seams (details in `backend/app/`):
 
 <!-- Architecture diagram, screenshot, and live link added as milestones complete. -->
 
-## Evaluation (M3 baseline)
+## Evaluation
 
-Measured on 26 hand-labeled examples over 4 documents — see
-[backend/evals/results](backend/evals/results/README.md) for full tables,
-judge models, and interpretation:
+Measured on 26 hand-labeled examples over 4 documents. Retrieval metrics
+(recall@k, MRR) are implemented from scratch and unit-tested; answer metrics
+are Ragas (LLM-as-judge, all means scored 26/26). Full tables, judge models,
+and interpretation: [backend/evals/results](backend/evals/results/README.md).
+The write-up [_How I measured and improved a RAG system's faithfulness_](docs/how-i-measured-and-improved-rag-faithfulness.md)
+walks through the methodology.
 
-| recall@1 | recall@3 | mrr@10 | faithfulness | answer relevancy | context precision | context recall |
-|---------:|---------:|-------:|-------------:|-----------------:|------------------:|---------------:|
-|    0.808 |    0.962 |  0.884 |    **1.000** |            0.881 |             0.872 |          0.724 |
+**M4 result — hybrid retrieval + cross-encoder reranking vs the dense baseline:**
 
-Retrieval metrics (recall@k, MRR) are implemented from scratch and unit-tested;
-answer metrics are Ragas (LLM-as-judge). Faithfulness 1.00 means every
-statement in every answer was entailed by the retrieved passages.
+| config | recall@1 | mrr@10 | faithfulness | context precision |
+|:--|--:|--:|--:|--:|
+| dense-only (baseline) | 0.808 | 0.884 | 1.000 | 0.865 |
+| hybrid + reranker | **0.885** | **0.929** | 1.000 | **0.914** |
+
+recall@1 improved **+7.7 points**, MRR **+4.6 points**, and context precision
+**+4.8 points**, while faithfulness held at 1.00 (every answer statement
+entailed by its retrieved context). Every judged mean is backed by per-sample
+scores at full 26/26 coverage — partially-scored runs are discarded, not
+reported.
 
 ## Status
 
 - [x] M1 — Ingestion, local embeddings, vector store, CLI query
 - [x] M2 — Generation with verifiable citations
 - [x] M3 — Evaluation harness (recall@k, MRR, Ragas)
-- [ ] M4 — Hybrid retrieval + reranking, measured improvement
+- [x] M4 — Hybrid retrieval + reranking, measured improvement
 - [ ] M5 — FastAPI + Next.js frontend, Docker, CI, deploy
 
 ## Setup
