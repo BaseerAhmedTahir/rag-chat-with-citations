@@ -69,9 +69,7 @@ class HybridRetriever:
         by_id: dict[str, Chunk] = {}
         for ranking in (dense, sparse):
             for rank, chunk in enumerate(ranking, start=1):
-                fused[chunk.id] = fused.get(chunk.id, 0.0) + 1.0 / (
-                    self._rrf_k + rank
-                )
+                fused[chunk.id] = fused.get(chunk.id, 0.0) + 1.0 / (self._rrf_k + rank)
                 by_id.setdefault(chunk.id, chunk)
 
         top = sorted(fused.items(), key=lambda item: item[1], reverse=True)[:k]

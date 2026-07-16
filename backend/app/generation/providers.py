@@ -1,4 +1,4 @@
-﻿"""The ChatProvider interface — swappable seam #2.
+"""The ChatProvider interface — swappable seam #2.
 
 Providers are thin REST wrappers (no vendor SDKs) selected by the
 ``LLM_PROVIDER`` env var. Adding a provider means adding one class and
@@ -22,9 +22,7 @@ def _post_with_retry(url: str, json: dict, headers: dict) -> httpx.Response:
     """POST with exponential backoff on rate-limit/overload responses."""
     response: httpx.Response | None = None
     for attempt in range(_MAX_ATTEMPTS):
-        response = httpx.post(
-            url, json=json, headers=headers, timeout=_TIMEOUT_SECONDS
-        )
+        response = httpx.post(url, json=json, headers=headers, timeout=_TIMEOUT_SECONDS)
         if response.status_code not in _RETRY_STATUS:
             return response
         if attempt < _MAX_ATTEMPTS - 1:
