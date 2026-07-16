@@ -7,6 +7,11 @@ rank-bm25==0.2.2
 python-dotenv==1.2.2
 httpx==0.28.1
 
+# API (M5)
+fastapi==0.139.2
+uvicorn[standard]==0.51.0
+python-multipart==0.0.32
+
 # Evals (M3)
 # ragas 0.4.x is incompatible with langchain-community 0.4.x (imports the
 # removed vertexai chat model), so the whole langchain stack is pinned to 0.3.x.
