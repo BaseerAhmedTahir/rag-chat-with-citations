@@ -1,5 +1,7 @@
 # RAG Document Chat — with Verifiable Citations & an Evaluation Harness
 
+[![CI](https://github.com/BaseerAhmedTahir/rag-chat-with-citations/actions/workflows/ci.yml/badge.svg)](https://github.com/BaseerAhmedTahir/rag-chat-with-citations/actions/workflows/ci.yml)
+
 Chat with your documents and get answers where **every claim cites its exact source**
 (file + page number), backed by a **measurable evaluation harness** (recall@k, MRR,
 Ragas faithfulness) that proves retrieval quality instead of assuming it.

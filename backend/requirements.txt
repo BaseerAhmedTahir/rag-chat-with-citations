@@ -1,4 +1,6 @@
-# Resolved at install time on 2026-07-12 (Python 3.12, CPU-only).
+# Core app + test dependencies. Resolved on 2026-07-12 (Python 3.12, CPU-only).
+# Eval-only dependencies (Ragas + LangChain judge stack) live in
+# requirements-eval.txt so the app/CI install stays lean and robust.
 sentence-transformers==5.6.0
 chromadb==1.5.9
 pymupdf==1.28.0
@@ -11,17 +13,6 @@ httpx==0.28.1
 fastapi==0.139.2
 uvicorn[standard]==0.51.0
 python-multipart==0.0.32
-
-# Evals (M3)
-# ragas 0.4.x is incompatible with langchain-community 0.4.x (imports the
-# removed vertexai chat model), so the whole langchain stack is pinned to 0.3.x.
-ragas==0.3.9
-langchain-google-genai==2.1.12
-langchain-huggingface==0.3.1
-langchain-community==0.3.31
-langchain-groq==0.3.8
-pandas==3.0.3
-tabulate==0.10.0
 
 # Dev / test
 pytest==9.1.1

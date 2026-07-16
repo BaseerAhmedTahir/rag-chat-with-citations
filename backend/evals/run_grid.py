@@ -43,9 +43,7 @@ def main() -> None:
                 chunk_size, OVERLAP, f"eval_cs{chunk_size}_ov{OVERLAP}", kind
             )
             summary, _ = eval_retrieval(retriever, examples)
-            rows.append(
-                {"chunk_size": chunk_size, "retriever": kind, **summary}
-            )
+            rows.append({"chunk_size": chunk_size, "retriever": kind, **summary})
             print(f"  {summary}")
 
     df = pd.DataFrame(rows)
