@@ -1,0 +1,262 @@
+:root {
+  --bg: #0b0f17;
+  --panel: #131a26;
+  --panel-2: #1a2334;
+  --border: #263247;
+  --text: #e6ebf3;
+  --muted: #93a1b8;
+  --accent: #5b9dff;
+  --accent-soft: #1e3355;
+  --ok: #3fbf7f;
+  --down: #e5674b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  line-height: 1.55;
+}
+
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.site-header h1 {
+  font-size: 1.9rem;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.subtitle {
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+
+.status {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.ok {
+  background: var(--ok);
+}
+.dot.down {
+  background: var(--down);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.upload input {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.upload-msg {
+  color: var(--ok);
+  font-size: 0.85rem;
+  margin: 10px 0 0;
+}
+
+.ask-row {
+  display: flex;
+  gap: 10px;
+}
+.ask-input {
+  flex: 1;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 1rem;
+}
+.ask-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.ask-btn {
+  background: var(--accent);
+  color: #06101f;
+  border: none;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ask-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.sample {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+}
+.sample:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.error {
+  background: #2a1614;
+  border: 1px solid var(--down);
+  color: #f2b8ab;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.notfound {
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.answer {
+  margin-top: 24px;
+}
+.answer-text {
+  font-size: 1.08rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin: 0 2px;
+  padding: 0 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: super;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.marker:hover:not(:disabled),
+.marker.active {
+  background: var(--accent);
+  color: #06101f;
+}
+.marker:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.citations {
+  margin-top: 20px;
+}
+.citations h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.citation {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: var(--panel);
+  transition: border-color 0.15s ease;
+}
+.citation.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.citation-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.citation-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 6px;
+}
+.citation-source {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.citation-snippet {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  white-space: pre-wrap;
+}
+
+.site-footer {
+  margin-top: 40px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
