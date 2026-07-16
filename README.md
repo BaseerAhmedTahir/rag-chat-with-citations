@@ -17,13 +17,45 @@ Ragas faithfulness) that proves retrieval quality instead of assuming it.
 
 ## Architecture
 
-Three swappable seams (details in `backend/app/`):
+Three swappable seams, each a small interface the rest of the system programs
+against (details in `backend/app/`):
 
-- `Retriever` — vector (ChromaDB), hybrid (BM25 + dense), reranking (cross-encoder)
-- `ChatProvider` — hosted LLM APIs, selected via `LLM_PROVIDER` env var
-- `Embedder` — local CPU sentence-transformers (`BAAI/bge-small-en-v1.5`)
+```
+                        ┌──────────────────────────────┐
+  PDF / DOCX  ─ingest─▶ │  parse (page nums) → chunk    │
+                        │  → Embedder → Retriever store │
+                        └──────────────┬───────────────┘
+                                       │
+  question ──────────────────────────────────────────────────────────▶ answer
+                        ┌───────────────────────────────┐             + citations
+                        │  Retriever.query(k)            │              (file+page)
+                        │  → ChatProvider.complete()     │
+                        │  → parse [n] markers → cite    │
+                        └───────────────────────────────┘
 
-<!-- Architecture diagram, screenshot, and live link added as milestones complete. -->
+  Seam 1  Retriever     VectorRetriever · HybridRetriever (BM25+dense, RRF)
+                        · RerankingRetriever (cross-encoder)
+  Seam 2  ChatProvider  Gemini · Groq · OpenAI   (select via LLM_PROVIDER)
+  Seam 3  Embedder      sentence-transformers  BAAI/bge-small-en-v1.5  (CPU)
+```
+
+Every chunk carries `source_file` + `page_number` + `chunk_index` from
+ingestion onward — the metadata contract that makes citations verifiable.
+The API resolves each `[n]` marker back to the exact passage shown to the
+model, so a citation can never point at model memory.
+
+<!-- Live demo GIF/screenshot added after deploy. -->
+<!-- LIVE_LINK -->
+
+## Quick start (Docker)
+
+```bash
+GROQ_API_KEY=... docker compose up --build
+# frontend → http://localhost:3000   ·   API → http://localhost:8000/docs
+```
+
+The backend auto-ingests four sample PDFs on startup, so the demo works
+immediately; upload your own via the UI or `POST /ingest`.
 
 ## Evaluation
 
@@ -53,27 +85,60 @@ reported.
 - [x] M2 — Generation with verifiable citations
 - [x] M3 — Evaluation harness (recall@k, MRR, Ragas)
 - [x] M4 — Hybrid retrieval + reranking, measured improvement
-- [ ] M5 — FastAPI + Next.js frontend, Docker, CI, deploy
+- [x] M5 — FastAPI + Next.js frontend, Docker, CI · _deploy pending live URL_
 
-## Setup
+## Local setup (without Docker)
+
+**Backend**
 
 ```bash
 cd backend
 python -m venv .venv
 # Windows: .venv\Scripts\activate   |   Unix: source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # fill in your LLM API key (needed from M2 on)
+pip install -r requirements.txt          # add -r requirements-eval.txt for evals
+cp .env.example .env                      # set your LLM API key (M2+)
+uvicorn app.api.main:app --reload         # API at http://localhost:8000
 ```
 
-### CLI usage (M1)
+**Frontend**
+
+```bash
+cd frontend
+npm install
+cp .env.example .env.local                # NEXT_PUBLIC_API_URL=http://localhost:8000
+npm run dev                               # UI at http://localhost:3000
+```
+
+### CLI (no server)
 
 ```bash
 python cli.py ingest path/to/document.pdf
 python cli.py query "What does the document say about X?"   # raw retrieval
-python cli.py ask "What does the document say about X?"     # cited answer (M2)
+python cli.py ask "What does the document say about X?"     # cited answer
 ```
 
 `ask` prints the answer followed by resolved citations — each `[n]` marker
 maps to the source file, page number, and the exact passage that grounded it.
 Questions the documents can't answer get an explicit "not found" response
 instead of a guess.
+
+### Evaluation harness
+
+```bash
+pip install -r requirements-eval.txt
+python evals/run_grid.py                  # deterministic recall@k / MRR grid
+python evals/run_evals.py --label baseline  # + Ragas judged metrics
+```
+
+## Deployment
+
+- **Backend** → Hugging Face Spaces (Docker SDK, port 7860); models baked into
+  the image. See [backend/README.md](backend/README.md) for the Space card.
+- **Frontend** → Vercel; set `NEXT_PUBLIC_API_URL` to the Space URL.
+- Vector store stays ChromaDB (embedded); sample docs auto-ingest on startup.
+
+## Tests & CI
+
+`pytest` covers the chunker, parsers, retriever, citation assembly, retrieval
+metrics, and API routes (37 tests). GitHub Actions runs ruff + pytest
+(backend) and eslint + build (frontend) on every push.
