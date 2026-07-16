@@ -137,6 +137,8 @@ python evals/run_evals.py --label baseline  # + Ragas judged metrics
 - **Frontend** → Vercel; set `NEXT_PUBLIC_API_URL` to the Space URL.
 - Vector store stays ChromaDB (embedded); sample docs auto-ingest on startup.
 
+Step-by-step instructions: [docs/DEPLOY.md](docs/DEPLOY.md).
+
 ## Tests & CI
 
 `pytest` covers the chunker, parsers, retriever, citation assembly, retrieval
