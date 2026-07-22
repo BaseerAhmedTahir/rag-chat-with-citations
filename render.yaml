@@ -1,0 +1,24 @@
+# Render Blueprint: free-tier backend deploy (slim ONNX stack).
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: rag-doc-chat-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements-slim.txt
+    startCommand: uvicorn app.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.11
+      - key: EMBEDDER_KIND
+        value: fastembed
+      - key: RETRIEVER_KIND
+        value: hybrid
+      - key: LLM_PROVIDER
+        value: groq
+      - key: GROQ_API_KEY
+        sync: false # set in the Render dashboard, never in git
+      - key: CORS_ORIGINS
+        value: "*"

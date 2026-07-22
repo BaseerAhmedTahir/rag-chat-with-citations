@@ -132,9 +132,12 @@ python evals/run_evals.py --label baseline  # + Ragas judged metrics
 
 ## Deployment
 
-- **Backend** → Hugging Face Spaces (Docker SDK, port 7860); models baked into
-  the image. See [backend/README.md](backend/README.md) for the Space card.
-- **Frontend** → Vercel; set `NEXT_PUBLIC_API_URL` to the Space URL.
+- **Backend** → Render free tier via [render.yaml](render.yaml), running the
+  **slim ONNX stack**: same `bge-small` model quantized via fastembed (~300 MB,
+  no torch) with `hybrid` retrieval. The M4-winning `hybrid_rerank` stack needs
+  ~1.5 GB and runs locally or via Docker — swapping stacks is one env var
+  (`EMBEDDER_KIND`), which is the architecture doing its job.
+- **Frontend** → Vercel; set `NEXT_PUBLIC_API_URL` to the Render URL.
 - Vector store stays ChromaDB (embedded); sample docs auto-ingest on startup.
 
 Step-by-step instructions: [docs/DEPLOY.md](docs/DEPLOY.md).
