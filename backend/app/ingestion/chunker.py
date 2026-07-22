@@ -45,6 +45,31 @@ class HFTokenCodec:
         return self._tokenizer.decode(ids, skip_special_tokens=True)
 
 
+class FastTokenCodec:
+    """Same tokenizer via the lightweight ``tokenizers`` library — for slim
+    deploys where ``transformers``/torch is not installed."""
+
+    def __init__(self, model_name: str = settings.embedding_model) -> None:
+        from tokenizers import Tokenizer
+
+        self._tokenizer = Tokenizer.from_pretrained(model_name)
+
+    def encode(self, text: str) -> list[int]:
+        return self._tokenizer.encode(text, add_special_tokens=False).ids
+
+    def decode(self, ids: list[int]) -> str:
+        return self._tokenizer.decode(ids, skip_special_tokens=True)
+
+
+def build_codec() -> TokenCodec:
+    """Codec matching the active embedder stack (see EMBEDDER_KIND)."""
+    import os
+
+    if os.getenv("EMBEDDER_KIND", "sentence_transformers").lower() == "fastembed":
+        return FastTokenCodec()
+    return HFTokenCodec()
+
+
 def _split_into_units(text: str, codec: TokenCodec, max_tokens: int) -> list[str]:
     """Recursively split text into units that each fit the token budget."""
     units: list[str] = []

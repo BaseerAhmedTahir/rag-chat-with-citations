@@ -13,8 +13,8 @@ import threading
 from pathlib import Path
 
 from app.config import BACKEND_DIR
-from app.ingestion.chunker import HFTokenCodec, chunk_document
-from app.ingestion.embedder import SentenceTransformerEmbedder
+from app.ingestion.chunker import TokenCodec, build_codec, chunk_document
+from app.ingestion.embedder import build_embedder
 from app.ingestion.parsers import SUPPORTED_EXTENSIONS, parse_document
 from app.retrieval.base import Retriever
 from app.retrieval.vector import VectorRetriever
@@ -34,7 +34,7 @@ class AppState:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._retriever: Retriever | None = None
-        self._codec: HFTokenCodec | None = None
+        self._codec: TokenCodec | None = None
 
     def _build_retriever(self, vector: VectorRetriever) -> Retriever:
         if RETRIEVER_KIND == "vector":
@@ -55,14 +55,13 @@ class AppState:
         if self._retriever is None:
             with self._lock:
                 if self._retriever is None:
-                    embedder = SentenceTransformerEmbedder()
-                    vector = VectorRetriever(embedder)
+                    vector = VectorRetriever(build_embedder())
                     self._retriever = self._build_retriever(vector)
-                    self._codec = HFTokenCodec()
+                    self._codec = build_codec()
         return self._retriever
 
     @property
-    def codec(self) -> HFTokenCodec:
+    def codec(self) -> TokenCodec:
         if self._codec is None:
             _ = self.retriever  # triggers construction
         assert self._codec is not None

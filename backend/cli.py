@@ -14,14 +14,14 @@ import time
 from pathlib import Path
 
 from app.config import settings
-from app.ingestion.chunker import HFTokenCodec, chunk_document
-from app.ingestion.embedder import SentenceTransformerEmbedder
+from app.ingestion.chunker import build_codec, chunk_document
+from app.ingestion.embedder import build_embedder
 from app.ingestion.parsers import SUPPORTED_EXTENSIONS, parse_document
 from app.retrieval.vector import VectorRetriever
 
 
 def _build_retriever() -> VectorRetriever:
-    return VectorRetriever(embedder=SentenceTransformerEmbedder())
+    return VectorRetriever(embedder=build_embedder())
 
 
 def _collect_files(path: Path) -> list[Path]:
@@ -42,7 +42,7 @@ def cmd_ingest(path_arg: str) -> None:
         print(f"No supported documents ({sorted(SUPPORTED_EXTENSIONS)}) found.")
         sys.exit(1)
 
-    codec = HFTokenCodec()
+    codec = build_codec()
     retriever = _build_retriever()
 
     for file in files:
