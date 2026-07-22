@@ -147,8 +147,13 @@ export default function Home() {
         ))}
 
       <footer className="site-footer">
-        Retrieval: hybrid (BM25 + dense) → cross-encoder rerank · Answers grounded
-        in retrieved context only.
+        Retrieval:{" "}
+        {health?.retriever_kind === "hybrid_rerank"
+          ? "hybrid (BM25 + dense) → cross-encoder rerank"
+          : health?.retriever_kind === "hybrid"
+            ? "hybrid (BM25 + dense, RRF)"
+            : "dense vector"}{" "}
+        · Answers grounded in retrieved context only.
       </footer>
     </main>
   );

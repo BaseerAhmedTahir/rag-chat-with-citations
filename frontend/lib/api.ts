@@ -30,6 +30,7 @@ export interface Health {
   chunks_indexed: number;
   embedding_model: string;
   llm_provider: string;
+  retriever_kind: string;
 }
 
 async function handle<T>(res: Response): Promise<T> {

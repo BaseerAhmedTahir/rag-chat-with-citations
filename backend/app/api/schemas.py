@@ -39,3 +39,4 @@ class HealthResponse(BaseModel):
     chunks_indexed: int
     embedding_model: str
     llm_provider: str
+    retriever_kind: str

@@ -10,7 +10,7 @@ from pathlib import Path
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.deps import state
+from app.api.deps import RETRIEVER_KIND, state
 from app.api.schemas import (
     CitationOut,
     HealthResponse,
@@ -55,6 +55,7 @@ def health() -> HealthResponse:
         chunks_indexed=state.chunk_count(),
         embedding_model=settings.embedding_model,
         llm_provider=os.getenv("LLM_PROVIDER", "gemini"),
+        retriever_kind=RETRIEVER_KIND,
     )
 
 
